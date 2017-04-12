@@ -1,9 +1,11 @@
 import chalk from 'chalk'
 import chokidar from 'chokidar'
+import fs from 'fs'
 import path from 'path'
 import readline from 'readline'
 
 import * as io from '../util/io'
+import { roundMinutes } from '../util/util'
 
 /**
  * Command state.
@@ -15,14 +17,57 @@ const state = {
     start: null,
     end: null
   },
+  existing: null,
   watcher: null,
   idleTimer: null
 }
 
 /**
+ * Timesheet log filename.
+ */
+const FILENAME = '.timesheet.json'
+
+/**
  * Idle timeout, in MINUTES.
  */
 const IDLE_TIMEOUT = 15
+
+/**
+ * Attempt to read and parse a timesheet file. The file will be created
+ * if it doesn't exist.
+ */
+const _loadJson = () => {
+  // Open or create the timesheet
+  let filePath = `${state.cwd}/${FILENAME}`
+  try {
+    state.existing = JSON.parse(fs.readFileSync(filePath, { encoding: 'utf8' }))
+  } catch (e) {
+    state.existing = []
+  }
+}
+
+const _writeJson = () => {
+  let filePath = `${state.cwd}/${FILENAME}`
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(state.existing), { encoding: 'utf8' })
+  } catch (e) {
+    io.clear()
+    io.writeln(chalk.red(' -> Save failed: ' + e))
+  }
+}
+
+/**
+ * Retrieve the last entry in the timesheet, if there is one.
+ *
+ * @return  {object|boolean}  The entry if there is one, or false otherwise.
+ */
+const _getLastEntry = () => {
+  if (state.existing && state.existing.length) {
+    return state.existing[state.existing.length - 1]
+  }
+
+  return false
+}
 
 /**
  * Reset the idle timer.
@@ -57,7 +102,17 @@ const _finish = () => {
   // Set end time
   state.data.end = new Date()
 
+  // Round datestamps
+  roundMinutes(state.data.start, 15, 10)
+  roundMinutes(state.data.end, 15, 5)
+
+  // Write file
+  state.existing.push(state.data)
+  _writeJson()
+
   console.log(state.data)
+  console.log(state.existing)
+
   state.watcher.close()
   process.exit()
 }
@@ -98,15 +153,25 @@ const start = (msg, opts) => {
   // Set working dir
   state.cwd = path.resolve(opts.dir || process.cwd())
 
+  // Try to load existing timesheet data
+  _loadJson()
+
   if (msg) {
     // Use given message if one exists
     state.data.msg = msg
     _run()
   } else {
     // Otherwise, prompt for one
+    // Set default message - repeat last entry's message if it exists
+    let defaultMsg = ''
+    let lastEntry = _getLastEntry()
+    if (lastEntry && lastEntry.msg) {
+      defaultMsg = lastEntry.msg
+    }
+
     let reader = readline.createInterface({ input: process.stdin, output: process.stdout })
     reader.question(
-      'Description ' + chalk.cyan(`[(default)]`) + ':\n',
+      'Description ' + chalk.cyan(`[${defaultMsg}]`) + ':\n',
       (answer) => {
         state.data.msg = answer
         _run()
