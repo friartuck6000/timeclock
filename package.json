@@ -1,0 +1,16 @@
+{
+  "name": "timeclock",
+  "version": "0.1.0",
+  "description": "Keep track of your time, dangit.",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Kyle Tucker <kyleatucker@gmail.com>",
+  "engines": {
+    "node": ">=6.10.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1"
+  }
+}
