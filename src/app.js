@@ -13,6 +13,7 @@ app.version(pkg.version)
 
 // Register start command
 app.command('start [msg]')
+  .option('-m, --manual-only', 'Disable the idle timeout')
   .option('-d, --dir <path>', 'Working directory')
   .action(startAction)
 

@@ -29,6 +29,6 @@ _commander2.default.version(_package2.default.version);
 
 
 // Command actions
-_commander2.default.command('start [msg]').option('-d, --dir <path>', 'Working directory').action(_start2.default);
+_commander2.default.command('start [msg]').option('-m, --manual-only', 'Disable the idle timeout').option('-d, --dir <path>', 'Working directory').action(_start2.default);
 
 _commander2.default.parse(process.argv);

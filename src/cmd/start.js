@@ -19,6 +19,7 @@ const state = {
   },
   existing: null,
   watcher: null,
+  allowTimer: true,
   idleTimer: null
 }
 
@@ -76,12 +77,14 @@ const _getLastEntry = () => {
  * Reset the idle timer.
  */
 const _resetTimer = () => {
-  clearTimeout(state.idleTimer)
-  state.idleTimer = setTimeout(() => {
-    io.clear()
-    io.writeln(' -> ', chalk.yellow(`Idle for ${IDLE_TIMEOUT} minutes; stopping...`))
-    _finish()
-  }, IDLE_TIMEOUT * 6000)
+  if (state.allowTimer) {
+    clearTimeout(state.idleTimer)
+    state.idleTimer = setTimeout(() => {
+      io.clear()
+      io.writeln(' -> ', chalk.yellow(`Idle for ${IDLE_TIMEOUT} minutes; stopping...`))
+      _finish()
+    }, IDLE_TIMEOUT * 60000)
+  }
 }
 
 /**
@@ -153,6 +156,11 @@ const _run = () => {
 const start = (msg, opts) => {
   // Set working dir
   state.cwd = path.resolve(opts.dir || process.cwd())
+
+  // Disable timer if specified
+  if (opts.manualOnly) {
+    state.allowTimer = false
+  }
 
   // Try to load existing timesheet data
   _loadJson()

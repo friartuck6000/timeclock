@@ -46,6 +46,7 @@ var state = {
   },
   existing: null,
   watcher: null,
+  allowTimer: true,
   idleTimer: null
 };
 
@@ -103,12 +104,14 @@ var _getLastEntry = function _getLastEntry() {
  * Reset the idle timer.
  */
 var _resetTimer = function _resetTimer() {
-  clearTimeout(state.idleTimer);
-  state.idleTimer = setTimeout(function () {
-    io.clear();
-    io.writeln(' -> ', _chalk2.default.yellow('Idle for ' + IDLE_TIMEOUT + ' minutes; stopping...'));
-    _finish();
-  }, IDLE_TIMEOUT * 6000);
+  if (state.allowTimer) {
+    clearTimeout(state.idleTimer);
+    state.idleTimer = setTimeout(function () {
+      io.clear();
+      io.writeln(' -> ', _chalk2.default.yellow('Idle for ' + IDLE_TIMEOUT + ' minutes; stopping...'));
+      _finish();
+    }, IDLE_TIMEOUT * 60000);
+  }
 };
 
 /**
@@ -179,6 +182,11 @@ var _run = function _run() {
 var start = function start(msg, opts) {
   // Set working dir
   state.cwd = _path2.default.resolve(opts.dir || process.cwd());
+
+  // Disable timer if specified
+  if (opts.manualOnly) {
+    state.allowTimer = false;
+  }
 
   // Try to load existing timesheet data
   _loadJson();
