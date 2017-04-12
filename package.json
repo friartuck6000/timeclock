@@ -5,6 +5,10 @@
   "keywords": [],
   "license": "MIT",
   "author": "Kyle Tucker <kyleatucker@gmail.com>",
+  "main": "dist/app.js",
+  "bin": {
+    "timeclock": "dist/app.js"
+  },
   "scripts": {
     "dev": "babel -w -d dist/ src/",
     "build": "babel -d dist/ src/"
@@ -13,6 +17,8 @@
     "node": ">=6.10.0"
   },
   "dependencies": {
+    "chalk": "^1.1.3",
+    "chokidar": "^1.6.1",
     "commander": "^2.9.0"
   },
   "devDependencies": {
