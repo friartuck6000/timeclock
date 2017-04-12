@@ -5,6 +5,10 @@
   "keywords": [],
   "license": "MIT",
   "author": "Kyle Tucker <kyleatucker@gmail.com>",
+  "scripts": {
+    "dev": "babel -w -d dist/ src/",
+    "build": "babel -d dist/ src/"
+  },
   "engines": {
     "node": ">=6.10.0"
   },
