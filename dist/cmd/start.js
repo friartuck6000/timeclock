@@ -73,6 +73,9 @@ var _loadJson = function _loadJson() {
   }
 };
 
+/**
+ * Write the data set to the timesheet.
+ */
 var _writeJson = function _writeJson() {
   var filePath = state.cwd + '/' + FILENAME;
   try {
@@ -105,7 +108,7 @@ var _resetTimer = function _resetTimer() {
     io.clear();
     io.writeln(' -> ', _chalk2.default.yellow('Idle for ' + IDLE_TIMEOUT + ' minutes; stopping...'));
     _finish();
-  }, IDLE_TIMEOUT * 600);
+  }, IDLE_TIMEOUT * 6000);
 };
 
 /**
@@ -137,9 +140,7 @@ var _finish = function _finish() {
   state.existing.push(state.data);
   _writeJson();
 
-  console.log(state.data);
-  console.log(state.existing);
-
+  // Exit
   state.watcher.close();
   process.exit();
 };

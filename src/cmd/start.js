@@ -46,6 +46,9 @@ const _loadJson = () => {
   }
 }
 
+/**
+ * Write the data set to the timesheet.
+ */
 const _writeJson = () => {
   let filePath = `${state.cwd}/${FILENAME}`
   try {
@@ -78,7 +81,7 @@ const _resetTimer = () => {
     io.clear()
     io.writeln(' -> ', chalk.yellow(`Idle for ${IDLE_TIMEOUT} minutes; stopping...`))
     _finish()
-  }, IDLE_TIMEOUT * 600)
+  }, IDLE_TIMEOUT * 6000)
 }
 
 /**
@@ -110,9 +113,7 @@ const _finish = () => {
   state.existing.push(state.data)
   _writeJson()
 
-  console.log(state.data)
-  console.log(state.existing)
-
+  // Exit
   state.watcher.close()
   process.exit()
 }
