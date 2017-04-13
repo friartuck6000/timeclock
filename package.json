@@ -1,0 +1,30 @@
+{
+  "name": "timeclock",
+  "version": "0.1.0",
+  "description": "Keep track of your time, dangit.",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Kyle Tucker <kyleatucker@gmail.com>",
+  "main": "dist/app.js",
+  "bin": {
+    "timeclock": "dist/app.js"
+  },
+  "scripts": {
+    "dev": "babel -w -d dist/ src/",
+    "build": "babel -d dist/ src/"
+  },
+  "engines": {
+    "node": ">=6.10.0"
+  },
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "chokidar": "^1.6.1",
+    "cli-table2": "^0.2.0",
+    "clone": "^2.1.1",
+    "commander": "^2.9.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1"
+  }
+}
