@@ -7,6 +7,7 @@ import pkg from '../package.json'
 
 // Command actions
 import startAction from './cmd/start'
+import parseAction from './cmd/parse'
 
 // Set up basic app config
 app.version(pkg.version)
@@ -17,4 +18,8 @@ app.command('start [msg]')
   .option('-d, --dir <path>', 'Working directory')
   .action(startAction)
 
+// Register parse command
+app.command('parse')
+  .option('-d, --dir <path>', 'Working directory')
+  .action(parseAction)
 app.parse(process.argv)
