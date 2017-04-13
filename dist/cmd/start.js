@@ -189,7 +189,7 @@ var start = function start(msg, opts) {
 
     var reader = _readline2.default.createInterface({ input: process.stdin, output: process.stdout });
     reader.question('Description ' + _chalk2.default.cyan('[' + defaultMsg + ']') + ':\n', function (answer) {
-      state.data.msg = answer;
+      state.data.msg = answer || defaultMsg;
       _run();
       reader.close();
     });

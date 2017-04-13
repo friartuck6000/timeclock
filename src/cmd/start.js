@@ -167,7 +167,7 @@ const start = (msg, opts) => {
     reader.question(
       'Description ' + chalk.cyan(`[${defaultMsg}]`) + ':\n',
       (answer) => {
-        state.data.msg = answer
+        state.data.msg = answer || defaultMsg
         _run()
         reader.close()
       }
