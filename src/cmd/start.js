@@ -1,6 +1,5 @@
 import chalk from 'chalk'
 import chokidar from 'chokidar'
-import fs from 'fs'
 import path from 'path'
 import readline from 'readline'
 
@@ -28,14 +27,10 @@ const state = {
  * Attempt to read and parse a timesheet file. The file will be created
  * if it doesn't exist.
  */
-const _loadJson = () => {
+const _readJson = () => {
   // Open or create the timesheet
   let filePath = `${state.cwd}/${FILENAME}`
-  try {
-    state.existing = JSON.parse(fs.readFileSync(filePath, { encoding: 'utf8' }))
-  } catch (e) {
-    state.existing = []
-  }
+  state.existing = io.readJson(filePath) || []
 }
 
 /**
@@ -43,9 +38,7 @@ const _loadJson = () => {
  */
 const _writeJson = () => {
   let filePath = `${state.cwd}/${FILENAME}`
-  try {
-    fs.writeFileSync(filePath, JSON.stringify(state.existing), { encoding: 'utf8' })
-  } catch (e) {
+  if (!io.writeJson(filePath, state.existing)) {
     io.clear()
     io.writeln(chalk.red(' -> Save failed: ' + e))
   }
@@ -142,7 +135,8 @@ const _run = () => {
  *                         prompted to enter one.
  * @param  {object}  opts  Optional parameters passed in.
  *
- * @param  {string}  opts.dir  A working directory to use (defults to the CWD).
+ * @param  {string}  opts.dir         A working directory to use (defults to the CWD).
+ * @param  {string}  opts.manualOnly  If set, automatic exit will be disabled.
  */
 const start = (msg, opts) => {
   // Set working dir
@@ -154,7 +148,7 @@ const start = (msg, opts) => {
   }
 
   // Try to load existing timesheet data
-  _loadJson()
+  _readJson()
 
   if (msg) {
     // Use given message if one exists

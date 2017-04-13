@@ -12,10 +12,6 @@ var _chokidar = require('chokidar');
 
 var _chokidar2 = _interopRequireDefault(_chokidar);
 
-var _fs = require('fs');
-
-var _fs2 = _interopRequireDefault(_fs);
-
 var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
@@ -23,6 +19,8 @@ var _path2 = _interopRequireDefault(_path);
 var _readline = require('readline');
 
 var _readline2 = _interopRequireDefault(_readline);
+
+var _config = require('../config');
 
 var _io = require('../util/io');
 
@@ -51,37 +49,21 @@ var state = {
 };
 
 /**
- * Timesheet log filename.
- */
-var FILENAME = '.timesheet.json';
-
-/**
- * Idle timeout, in MINUTES.
- */
-var IDLE_TIMEOUT = 15;
-
-/**
  * Attempt to read and parse a timesheet file. The file will be created
  * if it doesn't exist.
  */
-var _loadJson = function _loadJson() {
+var _readJson = function _readJson() {
   // Open or create the timesheet
-  var filePath = state.cwd + '/' + FILENAME;
-  try {
-    state.existing = JSON.parse(_fs2.default.readFileSync(filePath, { encoding: 'utf8' }));
-  } catch (e) {
-    state.existing = [];
-  }
+  var filePath = state.cwd + '/' + _config.FILENAME;
+  state.existing = io.readJson(filePath) || [];
 };
 
 /**
  * Write the data set to the timesheet.
  */
 var _writeJson = function _writeJson() {
-  var filePath = state.cwd + '/' + FILENAME;
-  try {
-    _fs2.default.writeFileSync(filePath, JSON.stringify(state.existing), { encoding: 'utf8' });
-  } catch (e) {
+  var filePath = state.cwd + '/' + _config.FILENAME;
+  if (!io.writeJson(filePath, state.existing)) {
     io.clear();
     io.writeln(_chalk2.default.red(' -> Save failed: ' + e));
   }
@@ -108,9 +90,9 @@ var _resetTimer = function _resetTimer() {
     clearTimeout(state.idleTimer);
     state.idleTimer = setTimeout(function () {
       io.clear();
-      io.writeln(' -> ', _chalk2.default.yellow('Idle for ' + IDLE_TIMEOUT + ' minutes; stopping...'));
+      io.writeln(' -> ', _chalk2.default.yellow('Idle for ' + _config.IDLE_TIMEOUT + ' minutes; stopping...'));
       _finish();
-    }, IDLE_TIMEOUT * 60000);
+    }, _config.IDLE_TIMEOUT * 60000);
   }
 };
 
@@ -177,7 +159,8 @@ var _run = function _run() {
  *                         prompted to enter one.
  * @param  {object}  opts  Optional parameters passed in.
  *
- * @param  {string}  opts.dir  A working directory to use (defults to the CWD).
+ * @param  {string}  opts.dir         A working directory to use (defults to the CWD).
+ * @param  {string}  opts.manualOnly  If set, automatic exit will be disabled.
  */
 var start = function start(msg, opts) {
   // Set working dir
@@ -189,7 +172,7 @@ var start = function start(msg, opts) {
   }
 
   // Try to load existing timesheet data
-  _loadJson();
+  _readJson();
 
   if (msg) {
     // Use given message if one exists
