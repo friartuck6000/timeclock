@@ -4,6 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import readline from 'readline'
 
+import { FILENAME, IDLE_TIMEOUT } from '../config'
 import * as io from '../util/io'
 import { roundMinutes } from '../util/util'
 
@@ -22,16 +23,6 @@ const state = {
   allowTimer: true,
   idleTimer: null
 }
-
-/**
- * Timesheet log filename.
- */
-const FILENAME = '.timesheet.json'
-
-/**
- * Idle timeout, in MINUTES.
- */
-const IDLE_TIMEOUT = 15
 
 /**
  * Attempt to read and parse a timesheet file. The file will be created
